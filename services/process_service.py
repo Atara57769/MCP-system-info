@@ -29,7 +29,6 @@ def get_high_resource_usage():
     return processes_dict
 
 
-
 def terminate_process_with_validation(pid: int) -> Dict[str, Any]:
     logger.info(f"Termination requested for PID {pid}")
 
@@ -39,9 +38,7 @@ def terminate_process_with_validation(pid: int) -> Dict[str, Any]:
     is_safe, reason = validation.is_process_safe_to_terminate(proc_info)
 
     if not is_safe:
-        logger.warning(
-            f"Termination blocked for PID {pid}. Reason: {reason}"
-        )
+        logger.warning(f"Termination blocked for PID {pid}. Reason: {reason}")
         return {
             "success": False,
             "message": reason,
@@ -62,11 +59,10 @@ def terminate_process_with_validation(pid: int) -> Dict[str, Any]:
     }
 
 
+def get_processes():
+    logger.info("Fetching all processes")
 
-def get_processes(limit: int):
-    logger.info(f"Fetching first {limit} processes")
-
-    processes = system_info.get_processes(limit)
+    processes = system_info.get_processes()
 
     result = {
         "count": len(processes),

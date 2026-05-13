@@ -32,7 +32,9 @@ def resource_usage_tool():
     return process_service.get_high_resource_usage()
 
 
-@mcp.tool(description="Terminate a process after validation and user confirmation")
+@mcp.tool(
+        description="Terminate a process after validation and user confirmation"
+)
 def terminate_process_tool(pid: int, confirmed: bool):
 
     if not confirmed:
@@ -40,10 +42,14 @@ def terminate_process_tool(pid: int, confirmed: bool):
     return process_service.terminate_process_with_validation(pid)
 
 
-@mcp.tool(description="Return the first 20 running processes in the system")
-def list_processes_tool(number: int = 30):
-    return process_service.get_processes(number)
+
+@mcp.tool(
+        description="Return all running processes in the system"
+)
+def list_processes_tool():
+    return process_service.get_processes()
 
 
 if __name__ == "__main__":
+    print("Starting MCP server...")
     mcp.run()

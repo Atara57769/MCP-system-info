@@ -76,9 +76,9 @@ def terminate_process(pid: int) -> bool:
         return False
 
 
-def get_processes(limit: int):
+def get_processes():
     """
-    Return the first running processes .
+    Return all running processes.
     """
     result: List[ProcessInfo] = []
 
@@ -86,10 +86,6 @@ def get_processes(limit: int):
         try:
             info = create_process_info(proc.pid)
             result.append(info)
-
-            if len(result) >= limit:
-                break
-
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
 

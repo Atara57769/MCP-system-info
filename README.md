@@ -79,9 +79,6 @@ Detects processes consuming excessive resources and returns only those safe to t
 
 Returns a list of currently running processes.
 
-Parameters:
-
-number (optional): number of processes to return (default: 30)
 
 ### terminate_process_tool
 
