@@ -1,60 +1,64 @@
+import os
+import sys
 import unittest
 from unittest.mock import patch, MagicMock
 
-import main 
+PROJECT_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..")
+)
 
+sys.path.insert(0, PROJECT_ROOT)
+
+import main
 
 class TestMCPTools(unittest.TestCase):
 
     # ----------------------------------
     # system_info_tool
     # ----------------------------------
-    @patch("main.system_info.get_system_info")
+    @patch("main.process_handler.get_system_info")
     def test_system_info_tool(self, mock_get_system_info):
 
-        mock_info_obj = MagicMock()
-        mock_info_obj.to_dict.return_value = {
+        mock_obj = MagicMock()
+        mock_obj.to_dict.return_value = {
             "System": "Windows",
-            "CPU Usage": 30,
-            "RAM": 16.0
+            "CPU Usage": 25
         }
 
-        mock_get_system_info.return_value = mock_info_obj
+        mock_get_system_info.return_value = mock_obj
 
         result = main.system_info_tool()
 
         self.assertEqual(result["System"], "Windows")
-        self.assertEqual(result["CPU Usage"], 30)
+        self.assertEqual(result["CPU Usage"], 25)
         mock_get_system_info.assert_called_once()
 
 
     # ----------------------------------
     # resource_usage_tool
     # ----------------------------------
-    @patch("main.validation.get_safe_to_terminate_process")
-    @patch("main.system_info.check_high_resource_usage")
-    def test_resource_usage_tool(
-        self,
-        mock_check_usage,
-        mock_validation
-    ):
+    @patch("main.process_handler.get_resource_usage")
+    def test_resource_usage_tool(self, mock_get_usage):
 
-        mock_process = MagicMock()
-        mock_process.to_dict.return_value = {"pid": 1234}
+        mock_usage = MagicMock()
+        mock_usage.to_dict.return_value = {
+            "high_usage_processes": [{"pid": 1234}]
+        }
 
-        mock_check_usage.return_value = ["raw_process"]
-        mock_validation.return_value = [mock_process]
+        mock_get_usage.return_value = mock_usage
 
         result = main.resource_usage_tool()
 
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0]["pid"], 1234)
+        self.assertEqual(
+            result["high_usage_processes"][0]["pid"], 1234
+        )
+        mock_get_usage.assert_called_once()
 
 
     # ----------------------------------
     # terminate_process_tool - no confirm
     # ----------------------------------
-    def test_terminate_process_without_confirmation(self):
+    def test_terminate_without_confirmation(self):
 
         result = main.terminate_process_tool(
             pid=111,
@@ -63,13 +67,17 @@ class TestMCPTools(unittest.TestCase):
 
         self.assertFalse(result["success"])
         self.assertEqual(result["pid"], 111)
+        self.assertEqual(
+            result["message"],
+            "User confirmation required"
+        )
 
 
     # ----------------------------------
     # terminate_process_tool - success
     # ----------------------------------
-    @patch("main.system_info.terminate_process_with_validation")
-    def test_terminate_process_success(self, mock_terminate):
+    @patch("main.process_handler.terminate_process_with_validation")
+    def test_terminate_success(self, mock_terminate):
 
         mock_terminate.return_value = {"success": True}
 
@@ -85,19 +93,19 @@ class TestMCPTools(unittest.TestCase):
     # ----------------------------------
     # list_processes_tool
     # ----------------------------------
-    @patch("main.system_info.get_processes")
-    def test_list_processes_tool(self, mock_get_processes):
+    @patch("main.process_handler.list_processes")
+    def test_list_processes_tool(self, mock_list):
 
-        mock_proc = MagicMock()
-        mock_proc.to_dict.return_value = {"pid": 1}
-
-        mock_get_processes.return_value = [mock_proc, mock_proc]
+        mock_list.return_value = [
+            {"pid": 1},
+            {"pid": 2},
+        ]
 
         result = main.list_processes_tool(2)
 
-        self.assertEqual(result["count"], 2)
-        self.assertEqual(len(result["processes"]), 2)
-        self.assertEqual(result["processes"][0]["pid"], 1)
+        mock_list.assert_called_once_with(2)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0]["pid"], 1)
 
 
 if __name__ == "__main__":
