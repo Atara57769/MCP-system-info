@@ -117,7 +117,9 @@ User confirmation is required.
 
 Run unit tests:
 
-python tests.py
+```json
+python -m unittest utils.tests
+```
 
 Tests use mocking to avoid interacting with real system processes.
 

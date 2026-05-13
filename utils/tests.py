@@ -16,7 +16,7 @@ class TestMCPTools(unittest.TestCase):
     # ----------------------------------
     # system_info_tool
     # ----------------------------------
-    @patch("main.process_handler.get_system_info")
+    @patch("main.process_service.get_system_info")
     def test_system_info_tool(self, mock_get_system_info):
 
         mock_obj = MagicMock()
@@ -37,23 +37,17 @@ class TestMCPTools(unittest.TestCase):
     # ----------------------------------
     # resource_usage_tool
     # ----------------------------------
-    @patch("main.process_handler.get_resource_usage")
+    @patch("main.process_service.get_high_resource_usage")
     def test_resource_usage_tool(self, mock_get_usage):
 
-        mock_usage = MagicMock()
-        mock_usage.to_dict.return_value = {
-            "high_usage_processes": [{"pid": 1234}]
-        }
-
-        mock_get_usage.return_value = mock_usage
+        mock_get_usage.return_value = [
+            {"pid": 1234}
+        ]
 
         result = main.resource_usage_tool()
 
-        self.assertEqual(
-            result["high_usage_processes"][0]["pid"], 1234
-        )
+        self.assertEqual(result[0]["pid"], 1234)
         mock_get_usage.assert_called_once()
-
 
     # ----------------------------------
     # terminate_process_tool - no confirm
@@ -76,7 +70,7 @@ class TestMCPTools(unittest.TestCase):
     # ----------------------------------
     # terminate_process_tool - success
     # ----------------------------------
-    @patch("main.process_handler.terminate_process_with_validation")
+    @patch("main.process_service.terminate_process_with_validation")
     def test_terminate_success(self, mock_terminate):
 
         mock_terminate.return_value = {"success": True}
@@ -93,7 +87,7 @@ class TestMCPTools(unittest.TestCase):
     # ----------------------------------
     # list_processes_tool
     # ----------------------------------
-    @patch("main.process_handler.list_processes")
+    @patch("main.process_service.get_processes")
     def test_list_processes_tool(self, mock_list):
 
         mock_list.return_value = [
