@@ -43,6 +43,7 @@ MCP FastMCP
 Install dependencies:
 
 pip install psutil
+
 pip install mcp
 
 ## ▶️ Running the MCP Server
