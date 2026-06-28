@@ -168,4 +168,3 @@ Intended for local development or controlled environments.
 
 MIT License
 
-https://github.com/user-attachments/assets/f84191e0-cceb-4bbc-bbad-2b900e37508c
